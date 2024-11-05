@@ -1,0 +1,7 @@
+fastapi
+pydantic
+transformers
+torch
+fasttext
+huggingface_hub
+gensim
