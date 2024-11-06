@@ -31,18 +31,19 @@ class NestedPrediction(RootModel):
 class TextInput(BaseModel):
     text: str
 
-@app.post("/predict-language", response_model=NestedPrediction)
-async def predict_language(input_data: TextInput) -> NestedPrediction:
+@app.post("/predict-language", response_model=List[Prediction])
+async def predict_language(input_data: TextInput) -> List[Prediction]:
     # Get top 5 language predictions
     predictions = ft_model.predict(input_data.text, k=5)
     languages = predictions[0]  # labels
     confidences = predictions[1]  # scores
 
-    # Format output as a nested list of dictionaries
+    # Format output as a flat list of dictionaries
     result = [
-        [{"label": lang.replace("__label__", ""), "score": score} for lang, score in zip(languages, confidences)]
+        {"label": lang.replace("__label__", ""), "score": score} 
+        for lang, score in zip(languages, confidences)
     ]
-    return NestedPrediction(root=result)
+    return result
 
 @app.post("/predict-tagalog", response_model=List[Prediction])
 async def predict_tagalog(input_data: TextInput) -> List[Prediction]:
