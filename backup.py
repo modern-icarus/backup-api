@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel
 from typing import List
 from huggingface_hub import hf_hub_download
 import fasttext
@@ -24,9 +24,6 @@ en_model = AutoModelForSequenceClassification.from_pretrained("Hate-speech-CNERG
 class Prediction(BaseModel):
     label: str
     score: float
-
-class NestedPrediction(RootModel):
-    root: List[List[Prediction]]  # Nested list structure for language prediction
 
 class TextInput(BaseModel):
     text: str
@@ -59,8 +56,8 @@ async def predict_tagalog(input_data: TextInput) -> List[Prediction]:
     ]
     return result
 
-@app.post("/predict-english", response_model=NestedPrediction)
-async def predict_english(input_data: TextInput) -> NestedPrediction:
+@app.post("/predict-english", response_model=List[Prediction])
+async def predict_english(input_data: TextInput) -> List[Prediction]:
     inputs = en_tokenizer(input_data.text, return_tensors="pt")
     outputs = en_model(**inputs)
     logits = outputs.logits
@@ -69,9 +66,8 @@ async def predict_english(input_data: TextInput) -> NestedPrediction:
     # Define custom labels for the English hate speech model
     labels = ["NON_HATE", "HATE"]
 
-    # Map the model outputs to labels in the desired nested format
+    # Map the model outputs to labels in a flat list
     result = [
-        [{"label": label, "score": score} for label, score in zip(labels, probabilities)]
+        {"label": label, "score": score} for label, score in zip(labels, probabilities)
     ]
-    return NestedPrediction(root=result)
-
+    return result
