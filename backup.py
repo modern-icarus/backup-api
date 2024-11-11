@@ -12,13 +12,12 @@ app = FastAPI()
 ft_model_path = hf_hub_download("facebook/fasttext-language-identification", "model.bin")
 ft_model = fasttext.load_model(ft_model_path)
 
-# Load the Tagalog hate speech detection model
-tl_tokenizer = AutoTokenizer.from_pretrained("ggpt1006/tl-hatespeech-detection")
-tl_model = AutoModelForSequenceClassification.from_pretrained("ggpt1006/tl-hatespeech-detection")
-
 # Load the English hate speech detection model
 en_tokenizer = AutoTokenizer.from_pretrained("Hate-speech-CNERG/dehatebert-mono-english")
 en_model = AutoModelForSequenceClassification.from_pretrained("Hate-speech-CNERG/dehatebert-mono-english")
+
+tl_tokenizer = AutoTokenizer.from_pretrained("ggpt1006/tl-hate-bert")
+tl_model = AutoModelForSequenceClassification.from_pretrained("ggpt1006/tl-hate-bert")
 
 # Define the response models
 class Prediction(BaseModel):
@@ -55,6 +54,7 @@ async def predict_tagalog(input_data: TextInput) -> List[Prediction]:
         for i, score in enumerate(probabilities)
     ]
     return result
+
 
 @app.post("/predict-english", response_model=List[Prediction])
 async def predict_english(input_data: TextInput) -> List[Prediction]:
