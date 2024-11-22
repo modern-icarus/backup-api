@@ -16,8 +16,8 @@ ft_model = fasttext.load_model(ft_model_path)
 en_tokenizer = AutoTokenizer.from_pretrained("Hate-speech-CNERG/dehatebert-mono-english")
 en_model = AutoModelForSequenceClassification.from_pretrained("Hate-speech-CNERG/dehatebert-mono-english")
 
-tl_tokenizer = AutoTokenizer.from_pretrained("ggpt1006/tl-hate-bert")
-tl_model = AutoModelForSequenceClassification.from_pretrained("ggpt1006/tl-hate-bert")
+tl_tokenizer = AutoTokenizer.from_pretrained("ggpt1006/tl-hate-bert-2")
+tl_model = AutoModelForSequenceClassification.from_pretrained("ggpt1006/tl-hate-bert-2")
 
 # Define the response models
 class Prediction(BaseModel):
